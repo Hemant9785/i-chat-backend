@@ -3,7 +3,7 @@ const generateToken = require("../config/generateToken");
 const User = require("../models/userModel.js");
 const bcrypt = require("bcryptjs");
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, name, password, pic } = req.body;
+  const { email, name, password, picture } = req.body;
 
   const userExists = await User.findOne({ email });
   if (userExists) {
@@ -13,7 +13,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
       name,
       email,
-      pic,
+      picture,
       password,
     });
 
@@ -38,7 +38,7 @@ const hashfun = asyncHandler(async (pass) => {
   return hs;
 });
 const authUser = asyncHandler(async (req, res) => {
-  console.log("login request ");
+  // console.log("login request ");
   const { email, password } = req.body;
 
   User.findOne({ email })
@@ -55,7 +55,7 @@ const authUser = asyncHandler(async (req, res) => {
           res.status(200).json({
             _id: user._id,
             email: user.email,
-            picture: user.pic,
+            picture: user.picture,
             token: generateToken(user._id),
             name: user.name,
             isAdmin: user.isAdmin,

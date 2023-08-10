@@ -8,7 +8,7 @@ const accessChats = asyncHandler(async (req, res) => {
   const { userId } = req.body;
   if (!userId) {
     throw new Error("user id param not sent with request");
-    return;
+    return res.sendStatus(400);
   }
 
   var isChat = Chat.find({
@@ -23,7 +23,7 @@ const accessChats = asyncHandler(async (req, res) => {
 
   isChat = await User.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "name picture email",
   });
 
   if (isChat.length > 0) res.send(isChat[0]);
@@ -57,14 +57,14 @@ const fetchChats = asyncHandler(async (req, res) => {
       .populate("groupAdmin", "-password")
       .populate("latestMessage")
       .sort({ updatedAt: -1 })
-      .then(async (result) => {
-        const results = await User.populate(result, {
+      .then(async (results) => {
+        results = await User.populate(results, {
           path: "latestMessage.sender",
-          select: "name email pic",
+          select: "name email picture",
         });
         // console.log(result);
         // console.log(results);
-        res.status(200).json(results);
+        res.status(200).send(results);
       });
   } catch (error) {
     console.log("fetch error ", error);
@@ -123,7 +123,7 @@ const renameGroup = asyncHandler(async (req, res) => {
 
   if (!updatedChat) {
     res.status(404);
-    // throw new Error("Chat Not Found");
+    throw new Error("Chat Not Found");
   } else {
     res.json(updatedChat);
   }
