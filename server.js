@@ -5,6 +5,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/mesageRoutes");
 const app = express();
 dotenv.config();
+const path = require("path");
 
 app.use(express.json()); //app can handle json data
 const connectDB = require("./config/db.js");
@@ -28,12 +29,30 @@ app.use("/api/messages", messageRoutes);
 
 //deployment/////////////////////
 
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
 /////////////////////////////////
 
+// fdkf
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+    // origin: "http://localhost:3000",
   },
 });
 io.on("connection", (socket) => {
